@@ -6,7 +6,6 @@ import os
 from powerskill.timer import timefunc
 
 load_dotenv()
-common.set_log_level(bool(os.environ['DEBUG']))
 
 def set_log_level(debug):
     """
@@ -16,6 +15,7 @@ def set_log_level(debug):
     if bool(debug):
         logging.basicConfig(level=logging.DEBUG)
 
+set_log_level(bool(os.environ['DEBUG']))
 
 def build_output_response(inputs, outputs):
     """
