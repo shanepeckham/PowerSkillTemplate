@@ -23,7 +23,7 @@ set_log_level(bool(os.environ['DEBUG']))
 model = joblib.load(os.path.join("models/", os.environ['VECTORISER_MODEL_PATH']))
 
 
-def build_output_response(inputs, outputs):
+def build_output_response(inputs, outputs,error=None):
     """
 
     :param inputs: The inputs gathered from the extraction process
@@ -35,18 +35,23 @@ def build_output_response(inputs, outputs):
     entity_values = {}
     entities = []
 
-    # spaCy NER
     entity_values['modelName'] = 'Your model'
     entity_values['language'] = 'EN'
     entity_values['text'] = 'Your prediction'
     entities.append(entity_values)
     entity_values = {}
 
+    if len(error) > 0:
+        errors = [error]
+    else:
+        errors = ""
+
     values.values.append({'recordId': inputs['values'][0]['recordId'], \
                           'correlationId': inputs['values'][0]['data']['correlationId'],
                           'batch': inputs['values'][0]['data']['batch'],
-                          'errors': outputs.ERROR,
-                          'data': entities})
+                          "errors": errors,
+                          "data": entity_values,
+                          "warnings": ""})
 
     return values
 
