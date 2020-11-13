@@ -1,11 +1,14 @@
-import operator
-import requests
-from dotenv import load_dotenv
 import logging
 import os
+
+import joblib
+from dotenv import load_dotenv
+from objdict import ObjDict
+
 from powerskill.timer import timefunc
 
 load_dotenv()
+
 
 def set_log_level(debug):
     """
@@ -15,7 +18,10 @@ def set_log_level(debug):
     if bool(debug):
         logging.basicConfig(level=logging.DEBUG)
 
+
 set_log_level(bool(os.environ['DEBUG']))
+model = joblib.load(os.path.join("models/", os.environ['VECTORISER_MODEL_PATH']))
+
 
 def build_output_response(inputs, outputs):
     """
@@ -30,22 +36,20 @@ def build_output_response(inputs, outputs):
     entities = []
 
     # spaCy NER
-    entity_values['modelName'] = 'spaCy NER'
+    entity_values['modelName'] = 'Your model'
     entity_values['language'] = 'EN'
-    entity_values['people'] = outputs.SPACY_ENGLISH_PER
-    entity_values['organisations'] = outputs.SPACY_ENGLISH_ORG
-    entity_values['locations'] = outputs.SPACY_ENGLISH_LOC
+    entity_values['text'] = 'Your prediction'
     entities.append(entity_values)
     entity_values = {}
 
     values.values.append({'recordId': inputs['values'][0]['recordId'], \
                           'correlationId': inputs['values'][0]['data']['correlationId'],
                           'batch': inputs['values'][0]['data']['batch'],
-                          'translatedDocumentLocation': inputs['values'][0]['data']['translatedContentTargetLocation'],
                           'errors': outputs.ERROR,
                           'data': entities})
 
     return values
+
 
 @timefunc
 def powerskill(inputs):
@@ -54,12 +58,13 @@ def powerskill(inputs):
     :return: 
     """
     try:
-       k = 1
+        outputs = {}
     except Exception as ProcessingError:
-        output_error_string = str(ProcessingError) + "File:" + str(file_name)
-        outputs.ERROR = output_error_string
-        output_response = []
-        output_response.append(output_error_string)
+        logging.exception(ProcessingError)
+        error = str(ProcessingError)
+        output_response = build_output_response(inputs, outputs)
+
+    logging.info(output_response)
 
     output_response = build_output_response(inputs, outputs)
     return output_response
