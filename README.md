@@ -94,3 +94,20 @@ Once your container is up and running you should:
 
 1. Open your test `.py` file (```tests/powerskill_api_test.py```) and set the Python interpreter to be your venv (bottom blue bar of VSCode)
 2. Use the python test explorer plugin to run your tests or click the 'run test' prompt above your tests
+
+
+## Remote SSH debugging
+
+To enable the ```SSH``` connection for development debugging if deployed to Azure Web Apps, deploy the file [```Dockerfile_debug```](containers/Dockerfile_debug)
+which will enable the Azure Web App to bridge a connection to the running docker instance. See the [Enable SSH](https://docs.microsoft.com/en-gb/azure/app-service/configure-custom-container?pivots=container-linux#enable-ssh)
+for more info. This is useful for inspecting running processes and checking model binaries are deployed correctly.
+
+The files [```ssdh_config```](containers/sshd_config) and [```startup.sh```](containers/startup.sh) are used only for this debugging 
+```Dockerfile_debug```. 
+
+### Connecting to the container
+
+* Once deployed, select the ```ssh``` option in the Azure portal on the web app
+* Click ```Go```
+* You should see green message at the bottom of the screen with ```SSH CONNECTION ESTABLISHED``` if successful
+* The terminal session should then be available for input
